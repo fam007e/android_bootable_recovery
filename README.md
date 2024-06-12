@@ -74,11 +74,69 @@ TWRP supports new recovery.fstab features for backup/restore capabilities. Examp
 Add your specific partitions and flags as necessary.
 
 ## Building TWRP
-1. Source the build environment:
+1- Source the build environment:
 ```sh
 source ./build/envsetup.sh
 ```
+2- Select the device:
+```sh
+lunch omni_<device_codename>-eng
+```
+3- Compile the recovery image:
+```sh
+make clean && make -j$(nproc) recoveryimage
+```
+Replace `$(nproc)` with the number of CPU cores +1 (e.g., for a quad-core CPU, use `-j5`).
+
+### Samsung Devices
+For most Samsung devices:
+```sh
+make -j$(nproc) bootimage
+```
+
+## A/B Devices
+For A/B devices (devices with duplicate partitions):
+1- Set the following in `BoardConfig.mk`:
+```makefile
+AB_OTA_UPDATER := true
+BOARD_USES_RECOVERY_AS_BOOT := true
+BOARD_BUILD_SYSTEM_ROOT_IMAGE := true
+```
+2- Update `recovery.fstab` for slot-select support:
+```fstab
+/boot emmc /dev/block/bootdevice/by-name/boot flags=slotselect
+/system ext4 /dev/block/bootdevice/by-name/system flags=slotselect
+/vendor ext4 /dev/block/bootdevice/by-name/vendor flags=slotselect;display="Vendor";backup=1
+```
+3- Compile the boot image:
+```sh
+make bootimage
+```
+
+## Flashing TWRP on A/B Devices
+Using Fastboot
+1- Check the active slot:
+```sh
+adb shell getprop ro.boot.slot_suffix
+```
+2- Switch to the inactive slot:
+```sh
+fastboot --set-active=_a
+```
+3- Flash TWRP:
+```sh
+fastboot flash boot twrp.img && fastboot reboot
+```
+
+## Additional Resources
+- [TWRP Source Code](https://github.com/TeamWin/android_bootable_recovery)
+- [Minimal Manifest TWRP](https://github.com/minimal-manifest-twrp)
+- [Old Guide](http://xdaforums.com/showpost.php?p=65482905&postcount=1471)
+
+## Community and Support
+For questions, join #twrp on Freenode or visit the XDA forums. If you successfully port TWRP to a new device, 
+please share your success stories with the community.
+
+Happy building!
 
 **Team Win Recovery Project (TWRP)**
-
-You can find a compiling guide [here](http://forum.xda-developers.com/showthread.php?t=1943625 "Guide").
