@@ -74,15 +74,15 @@ TWRP supports new recovery.fstab features for backup/restore capabilities. Examp
 Add your specific partitions and flags as necessary.
 
 ## Building TWRP
-1- Source the build environment:
+1. Source the build environment:
 ```sh
 source ./build/envsetup.sh
 ```
-2- Select the device:
+2. Select the device:
 ```sh
 lunch omni_<device_codename>-eng
 ```
-3- Compile the recovery image:
+3. Compile the recovery image:
 ```sh
 make clean && make -j$(nproc) recoveryimage
 ```
@@ -96,34 +96,35 @@ make -j$(nproc) bootimage
 
 ## A/B Devices
 For A/B devices (devices with duplicate partitions):
-1- Set the following in `BoardConfig.mk`:
+1. Set the following in `BoardConfig.mk`:
 ```makefile
 AB_OTA_UPDATER := true
 BOARD_USES_RECOVERY_AS_BOOT := true
 BOARD_BUILD_SYSTEM_ROOT_IMAGE := true
 ```
-2- Update `recovery.fstab` for slot-select support:
+2. Update `recovery.fstab` for slot-select support:
 ```fstab
 /boot emmc /dev/block/bootdevice/by-name/boot flags=slotselect
 /system ext4 /dev/block/bootdevice/by-name/system flags=slotselect
 /vendor ext4 /dev/block/bootdevice/by-name/vendor flags=slotselect;display="Vendor";backup=1
 ```
-3- Compile the boot image:
+3. Compile the boot image:
 ```sh
 make bootimage
 ```
 
 ## Flashing TWRP on A/B Devices
 Using Fastboot
-1- Check the active slot:
+
+1. Check the active slot:
 ```sh
 adb shell getprop ro.boot.slot_suffix
 ```
-2- Switch to the inactive slot:
+2. Switch to the inactive slot:
 ```sh
 fastboot --set-active=_a
 ```
-3- Flash TWRP:
+3. Flash TWRP:
 ```sh
 fastboot flash boot twrp.img && fastboot reboot
 ```
